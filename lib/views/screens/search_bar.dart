@@ -1,15 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:wed_assignment/core/enums/view_state.dart';
+import 'package:wed_assignment/core/models/artist_work.dart';
+import 'package:wed_assignment/core/services/search_service.dart';
 import 'package:wed_assignment/views/shared/constants.dart';
+import 'package:wed_assignment/views/shared/widgets/custom_tiles.dart';
 import 'package:wed_assignment/views/shared/widgets/quiet_box.dart';
 
-class Search extends StatefulWidget {
+class SearchBar extends StatefulWidget {
   @override
-  _SearchState createState() => _SearchState();
+  _SearchBarState createState() => _SearchBarState();
 }
 
-class _SearchState extends State<Search> {
+class _SearchBarState extends State<SearchBar> {
+  ViewState _viewState = ViewState.Idle;
+  SearchService _searchService = SearchService();
   TextEditingController searchController = TextEditingController();
   String query = "";
+  List<ArtistWork> works = [];
+  bool searchError = false;
 
   @override
   Widget build(BuildContext context) {
@@ -21,10 +29,11 @@ class _SearchState extends State<Search> {
             padding: EdgeInsets.only(left: 20.0),
             child: TextField(
               controller: searchController,
-              onChanged: (val) {
+              onSubmitted: (val) {
                 setState(() {
                   query = val;
                 });
+                getWorksList(query);
               },
               cursorColor: Colors.greenAccent,
               autofocus: true,
@@ -66,7 +75,51 @@ class _SearchState extends State<Search> {
           preferredSize: Size.fromHeight(45.0),
         ),
       ),
-      body: query.isEmpty ? QuietBox() : Container(color: kPurplishGrey),
+      body: searchError
+          ? QuietBox(error: searchError)
+          : works.isEmpty
+              ? QuietBox()
+              : _viewState == ViewState.Busy
+                  ? Center(
+                      child: CircularProgressIndicator(
+                        backgroundColor: Colors.greenAccent,
+                      ),
+                    )
+                  : Container(
+                      padding: EdgeInsets.only(top: 5.0),
+                      child: ListView.builder(
+                        itemCount: works.length,
+                        itemBuilder: (context, index) => CustomTile(
+                          artistName: works[index].artistName,
+                          songCover: works[index].artworkUrl100,
+                          songName: works[index].trackName,
+                        ),
+                      ),
+                    ),
     );
+  }
+
+  getWorksList(String name) async {
+    toggleState();
+    var _apiResponse = await _searchService.getWorksList(name);
+    if (_apiResponse.error == true) {
+      searchError = true;
+      works = [];
+    } else {
+      setState(() {
+        works = _apiResponse.data;
+      });
+    }
+    toggleState();
+  }
+
+  toggleState() {
+    _viewState == ViewState.Idle
+        ? setState(() {
+            _viewState = ViewState.Busy;
+          })
+        : setState(() {
+            _viewState = ViewState.Idle;
+          });
   }
 }

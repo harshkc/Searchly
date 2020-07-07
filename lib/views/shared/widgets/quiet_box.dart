@@ -2,6 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class QuietBox extends StatelessWidget {
+  final bool error;
+
+  const QuietBox({this.error = false});
+
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
@@ -11,13 +15,13 @@ class QuietBox extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
         Icon(
-          CupertinoIcons.search,
+          error ? Icons.warning : CupertinoIcons.search,
           size: size.height * 0.17,
           color: Colors.white,
         ),
         SizedBox(height: 10.0),
         Text(
-          "Find the music you love",
+          error ? "Oops Couldn't Find right now" : "Find the music you love",
           textAlign: TextAlign.center,
           style: TextStyle(
             color: Colors.white,
@@ -27,7 +31,9 @@ class QuietBox extends StatelessWidget {
         ),
         SizedBox(height: 10.0),
         Text(
-          "Search for artists, songs, playlist, and more",
+          error
+              ? "Check your connection or give us some time"
+              : "Search for artists, songs, playlist, and more",
           textAlign: TextAlign.center,
           style: TextStyle(
             color: Colors.white,

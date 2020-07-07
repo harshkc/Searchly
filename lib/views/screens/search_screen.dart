@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:wed_assignment/views/screens/search.dart';
+import 'package:wed_assignment/views/screens/search_bar.dart';
 import 'package:wed_assignment/views/shared/constants.dart';
 
 class SearchScreen extends StatelessWidget {
@@ -74,7 +74,7 @@ class SearchScreen extends StatelessWidget {
                       child: GestureDetector(
                         onTap: () => Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => Search()),
+                          MaterialPageRoute(builder: (context) => SearchBar()),
                         ),
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
